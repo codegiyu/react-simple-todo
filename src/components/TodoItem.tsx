@@ -1,24 +1,28 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { Modal } from './Modal';
+import { IdStore } from './TodoMain';
+import { TodoContext } from '../context/useTodo';
 
 export interface Todo {
-    id: string;
-    text: string;
-    isCompleted: boolean;
+  id: string;
+  text: string;
+  isCompleted: boolean;
 }
 
-interface TodoItemProps extends Todo {
-    setTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
-}
+// interface TodoItemProps extends Todo {
+//     setTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
+//     setTodoIds: React.Dispatch<React.SetStateAction<IdStore>>;
+// }
 
-const TodoItem: React.FC<TodoItemProps> = ({ id, text, isCompleted, setTodos }) => {
+const TodoItem: React.FC<Todo> = ({ id, text, isCompleted }) => {
+  const { setAllTodos, setTodoIds } = useContext(TodoContext);
   const [modalOpen, setModalOpen] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const target = e.target;
     const isChecked = target.checked;
 
-    setTodos((prevArr) => {
+    setAllTodos((prevArr) => {
       // const todosCopy = prevArr.map(item => {
       //     if (item.id === id) {
       //         item.isCompleted = isChecked;
@@ -39,7 +43,17 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, text, isCompleted, setTodos }) 
   };
 
   const deleteTodoItem = () => {
-    setTodos(prevArr => {
+    setTodoIds(prev => {
+      const newIds: IdStore = {...prev};
+      delete newIds[id];
+
+      // Save new value to localStorage
+      localStorage.setItem("todo-ids", JSON.stringify(newIds));
+
+      return newIds;
+    });
+
+    setAllTodos(prevArr => {
         const todosCopy = prevArr.filter(item => item.id !== id);
         localStorage.setItem("todos-list", JSON.stringify(todosCopy));
 

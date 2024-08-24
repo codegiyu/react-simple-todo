@@ -1,11 +1,16 @@
-import { ChangeEvent, FormEvent, useState } from "react"
+import { ChangeEvent, FormEvent, useContext, useState } from "react"
 import { Todo } from "./TodoItem";
+import { IdStore } from "./TodoMain";
+import { TodoContext } from "../context/useTodo";
 
-interface IAddTodoForm {
-  setTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
-}
+// interface IAddTodoForm {
+//   setTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
+//   todoIds: IdStore;
+//   setTodoIds: React.Dispatch<React.SetStateAction<IdStore>>;
+// }
 
-const AddTodoForm = ({ setTodos }: IAddTodoForm) => {
+const AddTodoForm = () => {
+  const { setAllTodos, todoIds, setTodoIds } = useContext(TodoContext);
   const [todoText, setTodoText] = useState("");
 
   const handleChange = (e: ChangeEvent) => {
@@ -31,7 +36,7 @@ const AddTodoForm = ({ setTodos }: IAddTodoForm) => {
         isCompleted: false
       };
 
-      setTodos((prev) => {
+      setAllTodos((prev) => {
         const todosCopy = [...prev];
 
         todosCopy.unshift(newTodo);
@@ -47,18 +52,25 @@ const AddTodoForm = ({ setTodos }: IAddTodoForm) => {
   };
 
   function createId() {
-    // Create a string of 6 random numbers;
-    const randomNum = String(Math.random()).slice(-4);
+    // Create a string of 4 random numbers;
+    let randomNum = String(Math.random()).slice(-4);
 
     // If that string exists in the global id store, create another... 
     // ...until you get one that is unique in the store
-    // while(todoIds[randomNum]) {
-    //     randomNum = String(Math.random()).slice(-4);
-    // }
+    while(todoIds[randomNum]) {
+        randomNum = String(Math.random()).slice(-4);
+    }
 
-    // // Set that id in the global id store as a property
-    // todoIds[randomNum] = true;
+    // Set that id in the global id store as a property
+    setTodoIds(prev => {
+      const newIds: IdStore = { ...prev, [randomNum]: true };
 
+      // Save to localstorage
+      localStorage.setItem("todo-ids", JSON.stringify(newIds));
+
+      return newIds;
+    });
+    
     return randomNum;
   }
 

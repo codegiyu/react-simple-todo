@@ -1,6 +1,6 @@
 import sun from "/icons/sun.svg";
 import moon from "/icons/moon.svg";
-import { useCallback, useEffect } from "react";
+import { useCallback, useLayoutEffect } from "react";
 
 const Header = () => {
   const setTheme = (theme: "light" | "dark") => {
@@ -30,7 +30,7 @@ const Header = () => {
     }
   }, []);
 
-  useEffect(() => handleTheme(), [handleTheme]);
+  useLayoutEffect(() => handleTheme(), [handleTheme]);
 
   return (
     <header>

@@ -1,13 +1,16 @@
 import TabBtn from "./TabBtn"
-import TodoItem, { Todo } from "./TodoItem"
+import TodoItem from "./TodoItem"
 import { TabControls } from "./MobileTodoTabControls"
+// import { IdStore } from "./TodoMain";
+import { useContext } from "react";
+import { TodoContext } from "../context/useTodo";
 
-type ITodosContentBlock = {
-    todos: Todo[];
-    setTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
-} & TabControls
+// type ITodosContentBlock = {
+//     todos: Todo[];
+// } & TabControls
 
-const TodosContentBlock: React.FC<ITodosContentBlock> = ({ activeTab, setActiveTab, todos, setTodos }) => {
+const TodosContentBlock: React.FC<TabControls> = ({ activeTab, setActiveTab }) => {
+  const { setAllTodos, displayedTodos } = useContext(TodoContext);
     // useEffect(() => {
     //     console.log({todos});
 
@@ -17,7 +20,7 @@ const TodosContentBlock: React.FC<ITodosContentBlock> = ({ activeTab, setActiveT
     // }, [todos]);
   
   const clearCompletedTodos = () => {
-    setTodos((prevArr) => {
+    setAllTodos((prevArr) => {
         const todosCopy = prevArr.filter(item => !item.isCompleted);
 
         return todosCopy;
@@ -27,19 +30,18 @@ const TodosContentBlock: React.FC<ITodosContentBlock> = ({ activeTab, setActiveT
   return (
     <section className="todos content-block">
         <ul className="todo-list" role="list">
-            {todos.map((item, idx) => (
+            {displayedTodos.map((item, idx) => (
                 <TodoItem 
                     key={idx} 
                     id={item.id} 
                     text={item.text} 
                     isCompleted={item.isCompleted}
-                    setTodos={setTodos}
                 />
             ))}
         </ul>
         <div className="todos-bottom">
             <p className="items-left">
-                <span className="todos-count">{todos.length}</span> items left
+                <span className="todos-count">{displayedTodos.length}</span> items left
             </p>
             <div className="large-todo-tab-controls">
                 <TabBtn tabName="All" isActive={activeTab === 'all'} setActiveTab={setActiveTab} />
